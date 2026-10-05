@@ -1,65 +1,28 @@
 import streamlit as st
-from streamlit_audiorecorder import audiorecorder
+from st_audiorec import st_audiorec
 
-st.set_page_config(
-    page_title="Asistente de Contingencia - CESFAM",
-    page_icon="🩺",
-    layout="wide"
-)
+st.set_page_config(page_title="Asistente de Contingencia", page_icon="🎙️", layout="centered")
 
-st.title("🩺 Asistente de Registro Clínico por Contingencia")
-st.markdown("Herramienta rápida para estructurar la consulta y llevarla a la hoja de respaldo de Rayen.")
+st.title("🎙️ Asistente de Voz - Contingencia")
+st.write("Graba tu audio para procesarlo y registrarlo.")
 
-col1, col2 = st.columns(2)
+# Sección de Grabación de Voz
+st.subheader("1. Grabación de Audio")
+wav_audio_data = st_audiorec()
 
-with col1:
-    st.subheader("1. Audio o Texto de la Consulta")
-    st.markdown("Puedes grabar la conversación directamente desde tu micrófono:")
-    
-    # Grabador de audio en el navegador
-    audio = audiorecorder("Grabar Audio", "Detener Grabación")
-    
-    if len(audio) > 0:
-        st.audio(audio.export().read())
-        st.success("¡Audio capturado con éxito!")
+if wav_audio_data is not None:
+    # Muestra el reproductor del audio grabado
+    st.audio(wav_audio_data, format='audio/wav')
+    st.success("¡Audio grabado exitosamente!")
 
-    st.markdown("---")
-    st.markdown("O escribe/pega el resumen de la atención:")
-    
-    texto_ejemplo = (
-        "Paciente de 40 años consulta por cefalea tensional de 2 días de evolución. "
-        "Al examen físico: sin alteraciones neurológicas agudas, presión arterial normal. "
-        "Se indica analgésico y reposo."
-    )
-    
-    texto_ingresado = st.text_area("Notas clínicas de la consulta:", value=texto_ejemplo, height=180)
-    
-    boton_procesar = st.button("Estructurar para Contingencia", type="primary", use_container_width=True)
+# Sección de Texto / Notas
+st.subheader("2. Registro de Texto")
+texto_nota = st.text_area("Edita o complementa el texto aquí antes de guardar:", placeholder="El texto transcrito o tus notas aparecerán aquí...")
 
-with col2:
-    st.subheader("2. Formato Oficial (Hoja de Contingencia)")
-    st.markdown("Resultado ordenado listo para **copiar y pegar**:")
-    
-    if boton_procesar:
-        with st.spinner("Procesando formato clínico..."):
-            
-            # Formato estándar listo para el portapapeles
-            resultado_final = f"""========================================
-HOJA DE CONTINGENCIA - REGISTRO CLÍNICO
-========================================
-
-* ANAMNESIS / HISTORIA CLÍNICA:
-  {texto_ingresado}
-
-* EXAMEN FÍSICO:
-  Evaluación realizada según pauta clínica de contingencia.
-
-* DIAGNÓSTICO / HIPÓTESIS:
-  Impresión diagnóstica registrada en atención.
-
-* PLAN / INDICACIONES:
-  - Indicaciones médicas entregadas al paciente.
-  - Reposo y pauta según corresponda.
-"""
-            st.code(resultado_final, language="markdown")
-            st.success("¡Estructurado con éxito! Ya puedes copiarlo.")
+# Botón para simular la acción de guardar o preparar para documento
+if st.button("Procesar y Guardar"):
+    if texto_nota.strip() != "":
+        st.success("¡Texto registrado correctamente para exportar!")
+        # Aquí puedes agregar la lógica para generar el archivo o procesar
+    else:
+        st.warning("Por favor, ingresa o genera texto para continuar.")
